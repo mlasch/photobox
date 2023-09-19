@@ -1,6 +1,8 @@
 let elem = document.getElementById("takePhoto");
 elem.addEventListener('click', fetchData);
 function fetchData() {
+    const preview_img = document.getElementById("preview");
+    preview_img.setAttribute('src', '');
     fetch("/photo", {method: "POST"});
 }
 
