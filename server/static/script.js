@@ -15,13 +15,25 @@ function printPhoto() {
     fetch("/print?filename="+filename, {method: "POST"});
 }
 
-const evtSource = new EventSource("/listen");
-evtSource.onmessage = (event) => {
-  // const newElement = document.createElement("li");
-  // const eventList = document.getElementById("list");
-    document.getElementById("preview").src = "static/images/"+`${event.data}`
-    print_photo_elem.style.display = "inline";
+let loadPhotoSSE;
 
-    // newElement.textContent = `message: ${event.data}`;
-    // eventList.appendChild(newElement);
+loadPhotoSSEInit = () => {
+    loadPhotoSSE = new EventSource("/listen");
+    loadPhotoSSE.onmessage = (event) => {
+        document.getElementById("preview").src = "static/images/"+`${event.data}`
+        print_photo_elem.style.display = "inline";
+    };
+
+    loadPhotoSSE.onerror = () => {
+        loadPhotoSSE.close();
+    }
 };
+loadPhotoSSEInit();
+
+setInterval(() => {
+    if (loadPhotoSSE.readyState === EventSource.OPEN) {
+        return null;
+    } else {
+        loadPhotoSSEInit();
+    }
+}, 5000);
