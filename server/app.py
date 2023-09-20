@@ -1,3 +1,4 @@
+import os
 import queue
 import subprocess
 from queue import Queue
@@ -7,14 +8,19 @@ from flask import Flask, Response, render_template, request
 
 from eventqueue import EventQueue
 
+from CaptureImage import take_photo
+
 
 def photo_task(photo_event, announcer, logger):
     """Take photo"""
     while True:
         photo_event.get()
         try:
-            stdout = subprocess.check_output(["sh", "gphoto_dummy.sh"])
-            filename = stdout.decode()
+            # stdout = subprocess.check_output(["sh", "gphoto_dummy.sh"])
+            # filename = stdout.decode()
+            os.chdir("static/images")
+            filename = take_photo("")
+
             announcer.announce(msg=filename)
         except subprocess.CalledProcessError as e:
             logger.warning("Failed to take photo: %s", e)

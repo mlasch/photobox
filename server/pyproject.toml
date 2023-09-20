@@ -7,6 +7,7 @@ authors = ["Marc Lasch <mlasch@mailbox.org>"]
 [tool.poetry.dependencies]
 python = '^3.8'
 flask = "^2.3.3"
+gphoto2 = "^2.5.0"
 
 [build-system]
 requires = ["poetry-core>=1.0.8"]
