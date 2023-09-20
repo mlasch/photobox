@@ -3,16 +3,32 @@ import subprocess
 from queue import Queue
 from threading import Thread
 
-from flask import Flask, Response, render_template
+from flask import Flask, Response, render_template, request
 
 from eventqueue import EventQueue
 
 
-def threaded_task(photo_event, announcer):
+def photo_task(photo_event, announcer):
+    """Take photo"""
     while True:
         photo_event.get()
-        stdout = subprocess.check_output(["sh", "gphoto_dummy.sh"])
-        announcer.announce(msg=stdout.decode())
+        try:
+            stdout = subprocess.check_output(["sh", "gphoto_dummy.sh"])
+
+            announcer.announce(msg=stdout.decode())
+        except subprocess.CalledProcessError as e:
+            pass
+
+
+def print_task(print_event):
+    """Send photo to printer"""
+    while True:
+        filename = print_event.get()
+        try:
+            stdout = subprocess.check_output(["sh", "gphoto_dummy.sh"])
+            print("PRINT ", filename)
+        except subprocess.CalledProcessError as e:
+            pass
 
 
 def make_app():
@@ -20,9 +36,13 @@ def make_app():
 
     announcer = EventQueue()
     photo_event = Queue(maxsize=1)
-    thread = Thread(target=threaded_task, args=(photo_event, announcer))
-    thread.daemon = True
-    thread.start()
+    print_event = Queue(maxsize=1)
+
+    photo_thread = Thread(target=photo_task, args=(photo_event, announcer), daemon=True)
+    photo_thread.start()
+
+    print_thread = Thread(target=print_task, args=(print_event,), daemon=True)
+    print_thread.start()
 
     @app.route('/')
     def hello_world():
@@ -32,6 +52,15 @@ def make_app():
     def photo():
         try:
             photo_event.put(True)
+        except queue.Full:
+            pass
+        return {}, 200
+
+    @app.route('/print', methods=['POST'])
+    def _print():
+        filename = request.args['filename']
+        try:
+            print_event.put(f"images/{filename}")
         except queue.Full:
             pass
         return {}, 200
