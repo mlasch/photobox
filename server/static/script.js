@@ -20,8 +20,13 @@ let loadPhotoSSE;
 loadPhotoSSEInit = () => {
     loadPhotoSSE = new EventSource("/listen");
     loadPhotoSSE.onmessage = (event) => {
-        document.getElementById("preview").src = "static/images/"+`${event.data}`
-        print_photo_elem.style.display = "inline";
+        if (event.data === "init") {
+            // Server sends a first reply in order to establish the connection
+            return null;
+        } else {
+            document.getElementById("preview").src = "static/images/" + `${event.data}`
+            print_photo_elem.style.display = "inline";
+        }
     };
 
     loadPhotoSSE.onerror = () => {

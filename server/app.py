@@ -70,6 +70,7 @@ def make_app():
         app.logger.debug("Start listen")
 
         def stream():
+            yield f"data: init\n\n"
             messages = announcer.listen()  # returns a queue.Queue
             while True:
                 msg = messages.get()  # blocks until a new message arrives
