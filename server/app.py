@@ -8,19 +8,19 @@ from flask import Flask, Response, render_template, request
 from eventqueue import EventQueue
 
 
-def photo_task(photo_event, announcer):
+def photo_task(photo_event, announcer, logger):
     """Take photo"""
     while True:
         photo_event.get()
         try:
             stdout = subprocess.check_output(["sh", "gphoto_dummy.sh"])
-
-            announcer.announce(msg=stdout.decode())
+            filename = stdout.decode()
+            announcer.announce(msg=filename)
         except subprocess.CalledProcessError as e:
-            pass
+            logger.warning("Failed to take photo: %s", e)
 
 
-def print_task(print_event):
+def print_task(print_event, logger):
     """Send photo to printer"""
     while True:
         filename = print_event.get()
@@ -28,7 +28,7 @@ def print_task(print_event):
             stdout = subprocess.check_output(["sh", "gphoto_dummy.sh"])
             print("PRINT ", filename)
         except subprocess.CalledProcessError as e:
-            pass
+            logger.warning("Failed to print photo: %s", e)
 
 
 def make_app():
@@ -38,10 +38,10 @@ def make_app():
     photo_event = Queue(maxsize=1)
     print_event = Queue(maxsize=1)
 
-    photo_thread = Thread(target=photo_task, args=(photo_event, announcer), daemon=True)
+    photo_thread = Thread(target=photo_task, args=(photo_event, announcer, app.logger), daemon=True)
     photo_thread.start()
 
-    print_thread = Thread(target=print_task, args=(print_event,), daemon=True)
+    print_thread = Thread(target=print_task, args=(print_event, app.logger), daemon=True)
     print_thread.start()
 
     @app.route('/')
@@ -67,13 +67,12 @@ def make_app():
 
     @app.route('/listen', methods=['GET'])
     def listen():
-        print("Start Listen")
+        app.logger.debug("Start listen")
 
         def stream():
             messages = announcer.listen()  # returns a queue.Queue
             while True:
                 msg = messages.get()  # blocks until a new message arrives
-                print("yield message", msg)
                 yield f"data: {msg}\n\n"
 
         return Response(stream(), mimetype='text/event-stream')
