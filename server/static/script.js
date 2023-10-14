@@ -1,9 +1,17 @@
 const take_photo_elem = document.getElementById("takePhoto");
 take_photo_elem.addEventListener('click', takePhotoEvent);
-function takePhotoEvent() {
+
+photoTimeout = () => {
+    fetch("/photo", {method: "POST"});
     const preview_img = document.getElementById("preview");
     preview_img.setAttribute('src', '');
-    fetch("/photo", {method: "POST"});
+    preview_img.style.display = "none";
+};
+
+function takePhotoEvent() {
+    const preview_img = document.getElementById("preview");
+    preview_img.setAttribute('src', 'static/countdown.gif');
+    setTimeout(photoTimeout, 7000);
 }
 
 const print_photo_elem = document.getElementById("printPhoto");
@@ -24,7 +32,9 @@ loadPhotoSSEInit = () => {
             // Server sends a first reply in order to establish the connection
             return null;
         } else {
-            document.getElementById("preview").src = "static/images/" + `${event.data}`
+            const preview_img = document.getElementById("preview")
+            preview_img.src = "static/images/" + `${event.data}`
+            preview_img.style.display = "inline";
             print_photo_elem.style.display = "inline";
         }
     };
