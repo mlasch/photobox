@@ -1,1 +1,35 @@
+body {
+    background-color: #FFFBF0;
+    text-align: center;
+}
+
+body h1 {
+    font-family: 'Cinzel', serif;
+    font-size: 3em;
+    font-weight: 400;
+    text-align: center;
+    margin: 0.5em;
+
+}
+
+body a {
+    font-family: 'Caudex', serif;
+    font-size: 1.6em;
+    color:black;
+    border:1px solid;
+    border-radius: 40px;
+    text-decoration: none;
+    padding: 10px;
+}
+
+a:active {
+    background-color: black;
+    color: #FFFBF0;
+}
+
+/*img {*/
+/*    box-shadow: 2px 2px 5px;*/
+/*}*/
+
+
 #printPhoto { display: none }
