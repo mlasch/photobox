@@ -8,7 +8,9 @@ from flask import Flask, Response, render_template, request
 
 from eventqueue import EventQueue
 
-from CaptureImage import take_photo
+from gphoto_wrapper import Camera
+
+camera = Camera("static/images")
 
 
 def photo_task(photo_event, announcer, logger):
@@ -16,10 +18,7 @@ def photo_task(photo_event, announcer, logger):
     while True:
         photo_event.get()
         try:
-            # stdout = subprocess.check_output(["sh", "gphoto_dummy.sh"])
-            # filename = stdout.decode()
-            os.chdir("static/images")
-            filename = take_photo("")
+            filename = camera.take_photo("temp_photos")
 
             announcer.announce(msg=filename)
         except subprocess.CalledProcessError as e:
@@ -31,8 +30,8 @@ def print_task(print_event, logger):
     while True:
         filename = print_event.get()
         try:
-            stdout = subprocess.check_output(["sh", "gphoto_dummy.sh"])
-            print("PRINT ", filename)
+            stdout = subprocess.check_output(["lp", filename])
+            logger.info("Printed %s", filename)
         except subprocess.CalledProcessError as e:
             logger.warning("Failed to print photo: %s", e)
 
@@ -66,7 +65,7 @@ def make_app():
     def _print():
         filename = request.args['filename']
         try:
-            print_event.put(f"images/{filename}")
+            print_event.put(f"{filename}")
         except queue.Full:
             pass
         return {}, 200
