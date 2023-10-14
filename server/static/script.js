@@ -16,11 +16,18 @@ function takePhotoEvent() {
 
 const print_photo_elem = document.getElementById("printPhoto");
 print_photo_elem.addEventListener('click', printPhoto);
+
+reEnablePrintButton = () => {
+    print_photo_elem.style.display = "inline";
+};
+
 function printPhoto() {
     const preview_img = document.getElementById("preview");
     const filename = preview_img.getAttribute('src');
     console.log(filename)
     fetch("/print?filename="+filename, {method: "POST"});
+    print_photo_elem.style.display = "none";
+    setTimeout(reEnablePrintButton, 10000);
 }
 
 let loadPhotoSSE;
