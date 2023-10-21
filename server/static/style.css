@@ -1,3 +1,21 @@
+/* caudex-regular - latin */
+@font-face {
+    font-display: swap; /* Check https://developer.mozilla.org/en-US/docs/Web/CSS/@font-face/font-display for other options. */
+    font-family: 'Caudex';
+    font-style: normal;
+    font-weight: 400;
+    src: url('/static/caudex-v17-latin-regular.woff2') format('woff2');
+}
+
+/* cinzel-regular - latin */
+@font-face {
+    font-display: swap; /* Check https://developer.mozilla.org/en-US/docs/Web/CSS/@font-face/font-display for other options. */
+    font-family: 'Cinzel';
+    font-style: normal;
+    font-weight: 400;
+    src: url('/static/cinzel-v23-latin-regular.woff2') format('woff2');
+}
+
 body {
     background-color: #FFFBF0;
     text-align: center;
@@ -5,14 +23,14 @@ body {
 
 body h1 {
     font-family: 'Cinzel', serif;
-    font-size: 3em;
+    font-size: 2.2em;
     font-weight: 400;
     text-align: center;
-    margin: 0.5em;
-
+    margin-top: 0.1em;
 }
 
 body a {
+
     font-family: 'Caudex', serif;
     font-size: 1.6em;
     color:black;
@@ -20,6 +38,7 @@ body a {
     border-radius: 40px;
     text-decoration: none;
     padding: 10px;
+    background-color: #FFFBF0;
 }
 
 a:active {
@@ -28,8 +47,7 @@ a:active {
 }
 
 /*img {*/
-/*    box-shadow: 2px 2px 5px;*/
+/*    opacity: 0.9;*/
 /*}*/
-
 
 #printPhoto { display: none }
